@@ -1,0 +1,17 @@
+{
+  "manifest_version": 1,
+  "name": "Tab Labels",
+  "version": "1.0.0",
+  "description": "Add customizable labels with colored indicators to your tabs",
+  "author": "Zen Browser Community",
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["mod.js"]
+    }
+  ],
+  "permissions": [
+    "tabs",
+    "storage"
+  ]
+}
