@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tab Labels</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+
+    h2 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .label-list {
+      background: white;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .label-item {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      margin-bottom: 5px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .label-item:hover {
+      background: #e9e9e9;
+    }
+
+    .label-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .label-text {
+      flex-grow: 1;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .label-count {
+      font-size: 12px;
+      color: #666;
+      margin-left: 8px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+      font-size: 14px;
+    }
+
+    .footer {
+      text-align: center;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .footer a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h2>Tab Labels</h2>
+
+  <div class="label-list" id="labelList">
+    <div class="empty-state">No labels created yet</div>
+  </div>
+
+  <div class="footer">
+    Right-click on any tab to add a label
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
