@@ -65,24 +65,36 @@ function createContextMenus() {
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === 'tab-label-new') {
     // Prompt for new label
-    browser.tabs.sendMessage(tab.id, {
-      action: 'showLabelDialog',
-      tabId: tab.id
-    });
+    try {
+      await browser.tabs.sendMessage(tab.id, {
+        action: 'showLabelDialog',
+        tabId: tab.id
+      });
+    } catch (error) {
+      // Content script not loaded - this can happen on protected pages
+      // or pages that haven't fully loaded yet
+      console.log('Could not open label dialog - content script not available on this page');
+    }
   } else if (info.menuItemId === 'tab-label-remove') {
     // Remove label from tab
-    removeTabLabel(tab.id);
+    await removeTabLabel(tab.id);
   } else if (info.menuItemId.startsWith('tab-label-quick-')) {
     // Quick label selection
     const labelText = info.menuItemId.replace('tab-label-quick-', '');
     const color = sessionLabels.get(labelText);
     if (color) {
       await saveTabLabel(tab.id, labelText, color);
-      browser.tabs.sendMessage(tab.id, {
-        action: 'updateLabel',
-        label: labelText,
-        color: color
-      });
+      // Try to update the label immediately, but don't fail if content script isn't ready
+      try {
+        await browser.tabs.sendMessage(tab.id, {
+          action: 'updateLabel',
+          label: labelText,
+          color: color
+        });
+      } catch (error) {
+        // Content script not loaded yet - label will be restored when page loads
+        console.log('Label saved - will be applied when page fully loads');
+      }
     }
   }
 });
@@ -114,9 +126,15 @@ async function removeTabLabel(tabId) {
 
   await browser.storage.local.set({ tabLabels: tabLabels });
 
-  browser.tabs.sendMessage(tabId, {
-    action: 'removeLabel'
-  });
+  // Try to remove label from page, but don't fail if content script isn't available
+  try {
+    await browser.tabs.sendMessage(tabId, {
+      action: 'removeLabel'
+    });
+  } catch (error) {
+    // Content script not available - label removed from storage anyway
+    console.log('Label removed from storage');
+  }
 }
 
 // Listen for messages from content scripts
@@ -126,9 +144,14 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     await saveTabLabel(tabId, labelText, color);
     return { success: true };
   } else if (message.action === 'getTabLabel') {
-    const result = await browser.storage.local.get('tabLabels');
-    const tabLabels = result.tabLabels || {};
-    return { label: tabLabels[message.tabId] };
+    // Use the tab ID from the message, or from the sender if not provided
+    const tabId = message.tabId || (sender.tab ? sender.tab.id : null);
+    if (tabId) {
+      const result = await browser.storage.local.get('tabLabels');
+      const tabLabels = result.tabLabels || {};
+      return { label: tabLabels[tabId], tabId: tabId };
+    }
+    return { label: null };
   } else if (message.action === 'getRandomColor') {
     const color = DEFAULT_COLORS[Math.floor(Math.random() * DEFAULT_COLORS.length)];
     return { color: color };

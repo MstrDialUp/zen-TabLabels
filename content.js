@@ -140,39 +140,33 @@ browser.runtime.onMessage.addListener((message) => {
     removeTabTitle();
   } else if (message.action === 'restoreLabel') {
     // Restore label from storage
-    browser.runtime.sendMessage({
-      action: 'getTabLabel',
-      tabId: message.tabId || currentTabId
-    }).then(response => {
-      if (response.label) {
-        updateTabTitle(response.label.text, response.label.color);
-      }
-    });
+    restoreLabelFromStorage();
   }
 });
 
-// Get current tab ID on load
-browser.runtime.sendMessage({ action: 'getCurrentTab' }).catch(() => {
-  // Extension context might not be ready
-});
+// Function to restore label from storage
+async function restoreLabelFromStorage() {
+  try {
+    // Ask background script for this tab's label
+    // Background script will use sender.tab.id to identify us
+    const response = await browser.runtime.sendMessage({
+      action: 'getTabLabel'
+    });
+
+    if (response && response.label) {
+      currentTabId = response.tabId;
+      updateTabTitle(response.label.text, response.label.color);
+    }
+  } catch (error) {
+    // No label stored or error occurred
+    console.log('No label to restore');
+  }
+}
 
 // Try to restore label on page load
-window.addEventListener('load', () => {
-  browser.tabs.getCurrent().then(tab => {
-    if (tab) {
-      currentTabId = tab.id;
-      browser.runtime.sendMessage({
-        action: 'getTabLabel',
-        tabId: tab.id
-      }).then(response => {
-        if (response && response.label) {
-          updateTabTitle(response.label.text, response.label.color);
-        }
-      }).catch(() => {
-        // No label stored
-      });
-    }
-  }).catch(() => {
-    // Not in a tab context
-  });
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', restoreLabelFromStorage);
+} else {
+  // Document already loaded
+  restoreLabelFromStorage();
+}
