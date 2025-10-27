@@ -11,9 +11,9 @@ You can use the provided `icon.svg` file to generate PNG icons at the required s
 
 ### Using ImageMagick (if installed):
 ```bash
-convert -background none icon.svg -resize 16x16 icon16.png
-convert -background none icon.svg -resize 48x48 icon48.png
-convert -background none icon.svg -resize 128x128 icon128.png
+magick -background none icon.svg -resize 16x16 icon16.png
+magick -background none icon.svg -resize 48x48 icon48.png
+magick -background none icon.svg -resize 128x128 icon128.png
 ```
 
 ### Using Inkscape (if installed):
