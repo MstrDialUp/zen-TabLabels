@@ -1,17 +1,48 @@
 {
-  "manifest_version": 1,
-  "name": "Tab Labels",
+  "manifest_version": 2,
+  "name": "Tab Labels for Zen Browser",
   "version": "1.0.0",
-  "description": "Add customizable labels with colored indicators to your tabs",
-  "author": "Zen Browser Community",
-  "content_scripts": [
-    {
-      "matches": ["*://*/*"],
-      "js": ["mod.js"]
-    }
-  ],
+  "description": "Add customizable color-coded labels to your tabs via context menu",
+
   "permissions": [
     "tabs",
-    "storage"
-  ]
+    "storage",
+    "contextMenus",
+    "<all_urls>"
+  ],
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_start"
+    }
+  ],
+
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tab-labels@zen-browser",
+      "strict_min_version": "109.0"
+    }
+  }
 }

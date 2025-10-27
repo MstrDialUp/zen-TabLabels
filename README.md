@@ -1,120 +1,189 @@
-# Zen Tab Labels
+# Tab Labels for Zen Browser
 
-A powerful mod for Zen Browser that allows you to add customizable labels to your tabs with colored indicators. Perfect for organizing your browsing sessions and keeping track of important tabs!
+A Firefox extension compatible with Zen Browser that allows you to add customizable, color-coded labels to your tabs via the context menu.
 
 ## Features
 
-- **Custom Labels**: Add descriptive text labels to any tab
-- **Color Coding**: Choose from 12 preset colors or pick your own custom color
-- **Context Menu Integration**: Easy access via right-click on any tab
-- **Persistent Storage**: Labels are saved across browser sessions using IndexedDB
-- **Visual Indicators**: Colored circles next to labels for quick visual identification
-- **Clean UI**: Beautiful dialog interface that matches Zen Browser's design
+- **Context Menu Integration**: Right-click on any tab or page to add labels
+- **Color-Coded Labels**: Each label has a colored circle indicator (randomly selected by default)
+- **Custom Colors**: Choose your own colors when creating labels
+- **Quick Label Selection**: Previously created labels appear in the context menu for quick reuse
+- **Visual Indicators**: Labels appear in the tab title with color-coded circles
+- **Session Persistence**: Labels are saved across browser sessions
+- **Label Management**: View all active labels and their usage in the extension popup
 
 ## Installation
 
-1. Download or clone this repository
-2. Place the `zen-TabLabels` folder in your Zen Browser mods directory:
-   - **Linux**: `~/.zen/mods/`
-   - **Windows**: `%APPDATA%\Zen\mods\`
-   - **macOS**: `~/Library/Application Support/Zen/mods/`
-3. Restart Zen Browser
-4. The mod should be automatically loaded
+### Development Installation (Temporary)
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/MstrDialUp/zen-TabLabels.git
+   cd zen-TabLabels
+   ```
+
+2. Generate icon files (see `icons/README.md` for instructions) or temporarily remove icon references from `manifest.json`
+
+3. Open Zen Browser (or Firefox)
+
+4. Navigate to `about:debugging#/runtime/this-firefox`
+
+5. Click "Load Temporary Add-on"
+
+6. Select the `manifest.json` file from the extension directory
+
+7. The extension will now be loaded and active
+
+### Permanent Installation
+
+To install permanently:
+
+1. Generate the required icon files (see `icons/README.md`)
+
+2. Package the extension as a `.xpi` file:
+   ```bash
+   zip -r tab-labels.xpi * -x "*.git*" -x "*node_modules*" -x "*.DS_Store"
+   ```
+
+3. Sign the extension through [addons.mozilla.org](https://addons.mozilla.org/developers/)
+
+4. Install the signed `.xpi` file in your browser
 
 ## Usage
 
-### Adding a Label
+### Adding a New Label
+
+1. Right-click on any tab (or anywhere on the page)
+2. Select **"Add Label to Tab"** → **"Create New Label..."**
+3. Enter your label text in the dialog
+4. Choose a color or click "Random" for a random color
+5. Click "Save"
+
+The tab title will now include your label with a colored indicator: `[Label] Page Title`
+
+### Using Existing Labels
 
 1. Right-click on any tab
-2. Select **"Add Label..."** from the context menu
-3. Enter your label text (up to 50 characters)
-4. Choose a color from the preset palette or use the custom color picker
-5. Click **"Save"**
+2. Select **"Add Label to Tab"**
+3. Choose from the list of previously created labels (shown with their color indicators)
 
-The label will appear underneath the tab title with your chosen color indicator.
+### Removing Labels
 
-### Editing a Label
+1. Right-click on the labeled tab
+2. Select **"Remove Label from Tab"**
 
-1. Right-click on a tab that already has a label
-2. Select **"Edit Label..."** from the context menu
-3. Modify the text or color
-4. Click **"Save"**
+### Viewing Label Statistics
 
-### Removing a Label
-
-You can remove a label in two ways:
-
-1. **From the context menu**:
-   - Right-click on the tab
-   - Select **"Remove Label"**
-
-2. **From the edit dialog**:
-   - Open the label dialog
-   - Click the **"Remove Label"** button
+1. Click the extension icon in the toolbar
+2. A popup will show all active labels and how many tabs use each label
 
 ## How It Works
 
-The mod uses several components:
+### Label Display
 
-- **storage.js**: Manages persistent storage using IndexedDB
-- **tabLabels.js**: Handles tab label rendering and management
-- **contextMenu.js**: Provides the context menu integration and dialog UI
-- **tabLabels.css**: Styles for the labels and dialog interface
-- **mod.js**: Main entry point that initializes all components
+Labels are displayed in two ways:
+1. **Tab Title**: The label is prepended to the tab title in brackets with a color indicator: `[Label] Original Title`
+2. **Context Menu**: Labels with their color indicators (●) appear in the context menu for quick reuse
 
-Labels are stored with a stable ID based on the tab's URL and context, ensuring they persist across browser restarts.
+### Storage
 
-## Customization
+- Labels are stored locally using the browser's `storage.local` API
+- Each tab's label is associated with its tab ID
+- Labels persist across browser sessions
+- Labels are automatically cleaned up when tabs are closed
 
-### Default Colors
+### Session Labels
 
-The mod comes with 12 preset colors:
-- Red (#FF6B6B)
-- Teal (#4ECDC4)
-- Blue (#45B7D1)
-- Coral (#FFA07A)
-- Mint (#98D8C8)
-- Yellow (#F7DC6F)
-- Purple (#BB8FCE)
-- Sky Blue (#85C1E2)
-- Orange (#F8B739)
-- Green (#52B788)
-- Crimson (#E63946)
-- Navy (#457B9D)
-
-You can also choose any custom color using the color picker!
+- The extension tracks all labels created during the current browser session
+- These labels appear in the context menu for quick access
+- The list updates dynamically as you create new labels
 
 ## Browser Compatibility
 
-This mod is designed for **Zen Browser** and requires:
-- Zen Browser 1.0.0 or higher
-- Firefox-based browser engine
+This extension is built for:
+- **Zen Browser** (Primary target)
+- **Firefox** 109.0 and later
+- Other Firefox-based browsers
 
-## Troubleshooting
+The extension uses Manifest V2 for maximum compatibility with Firefox and Zen Browser.
 
-**Labels not appearing after restart?**
-- Check that the mod is properly installed in the mods directory
-- Ensure you have the latest version of Zen Browser
+## File Structure
 
-**Context menu item not showing?**
-- Try restarting the browser
-- Check the browser console for any error messages
+```
+tab-labels/
+├── manifest.json          # Extension manifest
+├── background.js          # Background script (context menus, storage)
+├── content.js             # Content script (label UI, dialogs)
+├── styles.css             # Styles for label dialogs
+├── popup.html             # Extension popup HTML
+├── popup.js               # Extension popup JavaScript
+├── icons/                 # Extension icons
+│   ├── icon.svg          # SVG icon source
+│   ├── icon16.png        # 16x16 icon
+│   ├── icon48.png        # 48x48 icon
+│   └── icon128.png       # 128x128 icon
+└── README.md             # This file
+```
 
-**Custom colors not working?**
-- Make sure you're using a modern version of Zen Browser
-- Try using one of the preset colors as a fallback
+## Development
+
+### Prerequisites
+
+- Zen Browser or Firefox 109+
+- Basic knowledge of WebExtensions API
+
+### Making Changes
+
+1. Edit the source files
+2. Reload the extension in `about:debugging`
+3. Test your changes
+
+### Key Components
+
+- **background.js**: Handles context menu creation, label storage, and inter-script communication
+- **content.js**: Manages the label dialog UI and updates tab titles
+- **styles.css**: Provides styling for the label creation dialog
+- **popup.html/popup.js**: Displays label statistics in the toolbar popup
+
+## Permissions
+
+This extension requires the following permissions:
+
+- `tabs`: To access and modify tab information
+- `storage`: To save labels persistently
+- `contextMenus`: To add items to the context menu
+- `<all_urls>`: To inject label UI into all pages
+
+## Known Limitations
+
+1. **Tab Display**: Due to browser security restrictions, labels appear in the tab title rather than as separate visual elements in the tab bar itself. This is a limitation of the WebExtensions API.
+
+2. **Icon Files**: The repository includes an SVG source but requires PNG files to be generated for the extension to display icons properly.
+
+3. **Tab Identification**: Labels are tied to tab IDs, which may change if tabs are restored from a previous session. Future versions may implement URL-based label persistence.
+
+## Future Enhancements
+
+Potential features for future versions:
+- [ ] URL-based label persistence (labels that follow specific URLs)
+- [ ] Label groups and categories
+- [ ] Keyboard shortcuts for quick labeling
+- [ ] Export/import label configurations
+- [ ] Custom label templates
+- [ ] Search and filter tabs by label
 
 ## Contributing
 
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest new features
-- Submit pull requests
+Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## License
 
-MIT License - feel free to use and modify as needed!
+This project is open source. See the repository for license details.
 
 ## Credits
 
-Created for the Zen Browser community. Special thanks to all contributors and testers!
+Created for Zen Browser users who want better tab organization.
+
+## Support
+
+For issues, questions, or suggestions, please open an issue on the GitHub repository.
